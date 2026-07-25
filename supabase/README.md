@@ -44,5 +44,20 @@ psql "$(supabase db url)" -f seed.sql
 Ou coller le contenu des fichiers dans le **SQL Editor** du dashboard, dans
 l'ordre : `0001_init.sql` → `0002_rls.sql` → `seed.sql`.
 
-> ⚠️ Le projet Supabase HSM n'est pas encore créé. Il faudra en créer un
-> dédié (ne pas réutiliser le projet `bam`, qui est un autre produit).
+## Projet en ligne
+
+Projet Supabase dédié **`hsm`** : `pkksupaobxgfekskvazo`
+(`https://pkksupaobxgfekskvazo.supabase.co`). Migrations + seed déjà
+appliqués. L'app (`app/app.json` → extra) et le site (`web/config.js`)
+pointent dessus via la clé publishable.
+
+## Promouvoir un administrateur
+
+Après inscription d'un compte (email + mot de passe dans l'app), passer son
+rôle à `admin` pour débloquer le panneau d'administration :
+
+```sql
+update public.profiles set role = 'admin' where email = 'ton@email.com';
+-- ou Star Member :
+update public.profiles set role = 'star_member' where email = 'ton@email.com';
+```

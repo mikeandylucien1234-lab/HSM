@@ -46,8 +46,13 @@ bascule automatiquement sur Supabase.
 
 ## 🌐 Site web (`web/`)
 
-Maquettes autonomes (rendu JavaScript). À brancher sur Supabase via le
-client `@supabase/supabase-js` (mêmes tables que l'app).
+`web/index.html` — site public **connecté en direct à Supabase** (mêmes
+tables que l'app), sans build. Les maquettes d'origine sont conservées dans
+`web/mockups/` comme référence design.
+
+```bash
+cd web && npx serve .    # puis ouvrir l'URL affichée
+```
 
 ## 🗄️ Backend Supabase (`supabase/`)
 
@@ -73,9 +78,12 @@ supabase gen types typescript --project-id <ref> > app/src/lib/database.types.ts
 ## 🗺️ Roadmap
 
 - [x] Backend : schéma + RLS + seed
+- [x] Création du projet Supabase HSM + application des migrations (`pkksupaobxgfekskvazo`)
 - [x] App : design system, client Supabase, écran Home
-- [ ] App : écrans Live / Émissions / Charts / Compte / Auth
-- [ ] App : Admin (création émissions, modération, programmation)
-- [ ] Web : branchement Supabase sur les maquettes
-- [ ] Création du projet Supabase HSM + application des migrations
+- [x] App : auth + écrans Live / Émissions / Charts / Compte
+- [x] App : Admin (création émissions, live toggle, notifications, stats)
+- [x] Web : site connecté en direct à Supabase
+- [ ] Lecteur vidéo + chat live temps réel
+- [ ] Paiement Star Member (Stripe) + programmation hebdo côté admin
+- [ ] Notifications push (Expo) + upload d'images (Supabase Storage)
 ```
