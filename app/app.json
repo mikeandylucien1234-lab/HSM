@@ -26,8 +26,8 @@
       "bundler": "metro"
     },
     "extra": {
-      "supabaseUrl": "",
-      "supabaseAnonKey": "",
+      "supabaseUrl": "https://pkksupaobxgfekskvazo.supabase.co",
+      "supabaseAnonKey": "sb_publishable_6B1BC6py8q6TTpzgz5Pn4w_JYnwqLBS",
       "eas": {
         "projectId": "REPLACE_WITH_YOUR_EAS_PROJECT_ID"
       }
