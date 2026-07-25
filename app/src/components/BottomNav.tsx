@@ -10,7 +10,7 @@ export interface NavItem {
   icon: keyof typeof Ionicons.glyphMap;
 }
 
-const ITEMS: NavItem[] = [
+const BASE_ITEMS: NavItem[] = [
   { key: 'home', label: 'Accueil', icon: 'home' },
   { key: 'live', label: 'En direct', icon: 'radio' },
   { key: 'shows', label: 'Émissions', icon: 'grid' },
@@ -18,17 +18,22 @@ const ITEMS: NavItem[] = [
   { key: 'account', label: 'Compte', icon: 'person' },
 ];
 
+const ADMIN_ITEM: NavItem = { key: 'admin', label: 'Admin', icon: 'settings' };
+
 export function BottomNav({
   active = 'home',
   onSelect,
+  showAdmin = false,
 }: {
   active?: string;
   onSelect?: (key: string) => void;
+  showAdmin?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const items = showAdmin ? [...BASE_ITEMS, ADMIN_ITEM] : BASE_ITEMS;
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      {ITEMS.map((item) => {
+      {items.map((item) => {
         const on = item.key === active;
         return (
           <Pressable key={item.key} style={styles.item} onPress={() => onSelect?.(item.key)}>

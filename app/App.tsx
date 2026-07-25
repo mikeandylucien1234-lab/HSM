@@ -11,15 +11,17 @@ import {
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { colors } from './src/theme';
-import { AuthProvider } from './src/lib/auth';
+import { AuthProvider, useAuth } from './src/lib/auth';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { LiveScreen } from './src/screens/LiveScreen';
 import { ShowsScreen } from './src/screens/ShowsScreen';
 import { ChartsScreen } from './src/screens/ChartsScreen';
 import { AccountScreen } from './src/screens/AccountScreen';
+import { AdminScreen } from './src/screens/AdminScreen';
 import { BottomNav } from './src/components/BottomNav';
 
 function Router() {
+  const { isAdmin } = useAuth();
   const [tab, setTab] = useState('home');
   return (
     <View style={styles.root}>
@@ -29,8 +31,9 @@ function Router() {
         {tab === 'shows' && <ShowsScreen />}
         {tab === 'charts' && <ChartsScreen />}
         {tab === 'account' && <AccountScreen />}
+        {tab === 'admin' && <AdminScreen />}
       </View>
-      <BottomNav active={tab} onSelect={setTab} />
+      <BottomNav active={tab} onSelect={setTab} showAdmin={isAdmin} />
     </View>
   );
 }

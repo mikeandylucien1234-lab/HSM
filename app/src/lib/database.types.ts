@@ -118,6 +118,15 @@ export interface Database {
         Update: Partial<{ read: boolean }>;
         Relationships: [];
       };
+      chat_messages: {
+        Row: {
+          id: string; show_id: string | null; user_id: string | null;
+          body: string; flagged: boolean; created_at: string;
+        };
+        Insert: { body: string; show_id?: string | null; user_id?: string | null };
+        Update: Partial<{ flagged: boolean }>;
+        Relationships: [];
+      };
     };
     Views: {
       poll_results: {
