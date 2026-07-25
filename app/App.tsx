@@ -17,12 +17,18 @@ import { LiveScreen } from './src/screens/LiveScreen';
 import { ShowsScreen } from './src/screens/ShowsScreen';
 import { ChartsScreen } from './src/screens/ChartsScreen';
 import { AccountScreen } from './src/screens/AccountScreen';
-import { AdminScreen } from './src/screens/AdminScreen';
+import { AdminApp } from './src/screens/AdminApp';
 import { BottomNav } from './src/components/BottomNav';
 
 function Router() {
   const { isAdmin } = useAuth();
   const [tab, setTab] = useState('home');
+
+  // L'admin est une application à part entière (sa propre nav basse).
+  if (tab === 'admin') {
+    return <AdminApp onExit={() => setTab('home')} />;
+  }
+
   return (
     <View style={styles.root}>
       <View style={styles.content}>
@@ -31,7 +37,6 @@ function Router() {
         {tab === 'shows' && <ShowsScreen />}
         {tab === 'charts' && <ChartsScreen />}
         {tab === 'account' && <AccountScreen />}
-        {tab === 'admin' && <AdminScreen />}
       </View>
       <BottomNav active={tab} onSelect={setTab} showAdmin={isAdmin} />
     </View>

@@ -127,6 +127,36 @@ export interface Database {
         Update: Partial<{ flagged: boolean }>;
         Relationships: [];
       };
+      schedule_slots: {
+        Row: {
+          id: string; show_id: string | null; title: string;
+          category_id: string | null; starts_at: string; duration_min: number;
+        };
+        Insert: { title: string; starts_at: string; show_id?: string | null; category_id?: string | null; duration_min?: number };
+        Update: Partial<{ title: string; starts_at: string; duration_min: number }>;
+        Relationships: [];
+      };
+      subscriptions: {
+        Row: {
+          id: string; user_id: string; plan: 'monthly' | 'yearly';
+          status: 'active' | 'canceled' | 'past_due'; started_at: string; renews_at: string | null;
+        };
+        Insert: { user_id: string; plan?: 'monthly' | 'yearly'; status?: 'active' | 'canceled' | 'past_due'; renews_at?: string | null };
+        Update: Partial<{ status: 'active' | 'canceled' | 'past_due'; renews_at: string | null }>;
+        Relationships: [];
+      };
+      guests: {
+        Row: { id: string; name: string; avatar_url: string | null; bio: string | null };
+        Insert: { name: string; avatar_url?: string | null; bio?: string | null };
+        Update: Partial<{ name: string; avatar_url: string | null; bio: string | null }>;
+        Relationships: [];
+      };
+      playlists: {
+        Row: { id: string; owner_id: string | null; title: string; is_public: boolean; created_at: string };
+        Insert: { title: string; owner_id?: string | null; is_public?: boolean };
+        Update: Partial<{ title: string; is_public: boolean }>;
+        Relationships: [];
+      };
     };
     Views: {
       poll_results: {
