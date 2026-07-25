@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   option: { marginBottom: spacing.sm },
   optionBg: {
     backgroundColor: colors.surfaceAlt, borderRadius: radius.md, overflow: 'hidden',
-    height: 44, justifyContent: 'center',
+    height: 48, justifyContent: 'center', borderWidth: 1, borderColor: colors.border,
   },
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, opacity: 0.35 },
   optionRow: {

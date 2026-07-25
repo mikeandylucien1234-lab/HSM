@@ -10,34 +10,30 @@ export interface NavItem {
   icon: keyof typeof Ionicons.glyphMap;
 }
 
-const BASE_ITEMS: NavItem[] = [
+/** Navigation utilisateur — identique à la maquette HSM_Home. */
+const ITEMS: NavItem[] = [
   { key: 'home', label: 'Accueil', icon: 'home' },
-  { key: 'live', label: 'En direct', icon: 'radio' },
-  { key: 'shows', label: 'Émissions', icon: 'grid' },
-  { key: 'charts', label: 'Charts', icon: 'trending-up' },
-  { key: 'account', label: 'Compte', icon: 'person' },
+  { key: 'live', label: 'Live', icon: 'videocam' },
+  { key: 'programme', label: 'Programme', icon: 'calendar' },
+  { key: 'search', label: 'Recherche', icon: 'search' },
+  { key: 'profil', label: 'Profil', icon: 'person' },
 ];
-
-const ADMIN_ITEM: NavItem = { key: 'admin', label: 'Admin', icon: 'settings' };
 
 export function BottomNav({
   active = 'home',
   onSelect,
-  showAdmin = false,
 }: {
   active?: string;
   onSelect?: (key: string) => void;
-  showAdmin?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const items = showAdmin ? [...BASE_ITEMS, ADMIN_ITEM] : BASE_ITEMS;
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-      {items.map((item) => {
+      {ITEMS.map((item) => {
         const on = item.key === active;
         return (
           <Pressable key={item.key} style={styles.item} onPress={() => onSelect?.(item.key)}>
-            <Ionicons name={item.icon} size={22} color={on ? colors.red : colors.textDim} />
+            <Ionicons name={on ? item.icon : (`${item.icon}-outline` as any)} size={22} color={on ? colors.red : colors.textDim} />
             <Text style={[styles.label, on && styles.labelOn]}>{item.label}</Text>
           </Pressable>
         );
