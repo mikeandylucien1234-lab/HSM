@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { colors } from './src/theme';
 import { AuthProvider } from './src/lib/auth';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { LiveScreen } from './src/screens/LiveScreen';
 import { ProgrammeScreen } from './src/screens/ProgrammeScreen';
@@ -54,7 +55,7 @@ function Router() {
 }
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -62,14 +63,25 @@ export default function App() {
     Inter_800ExtraBold,
   });
 
-  if (!fontsLoaded) return <View style={styles.root} />;
+  // Filet de sécurité : on démarre au bout de 3 s même si les polices
+  // ne répondent jamais (évite tout écran noir permanent).
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // On démarre dès que les polices sont prêtes, en cas d'échec, ou au timeout.
+  if (!fontsLoaded && !fontError && !timedOut) return <View style={styles.root} />;
 
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <AuthProvider>
-        <Router />
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <Router />
+        </AuthProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }
