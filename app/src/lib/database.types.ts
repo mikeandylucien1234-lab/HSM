@@ -97,6 +97,12 @@ export interface Database {
         Update: Partial<{ label: string; sort_order: number }>;
         Relationships: [];
       };
+      poll_votes: {
+        Row: { poll_id: string; option_id: string; user_id: string; created_at: string };
+        Insert: { poll_id: string; option_id: string; user_id: string };
+        Update: Partial<{ option_id: string }>;
+        Relationships: [];
+      };
       partners: {
         Row: { id: string; label: string; logo_url: string | null; website: string | null; sort_order: number };
         Insert: { label: string; logo_url?: string | null; website?: string | null; sort_order?: number };

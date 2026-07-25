@@ -5,10 +5,12 @@
  * identique à la maquette web et l'app démarre sans backend.
  */
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import type { Show, ContentSection, Poll, Partner } from '../types';
+import type {
+  Show, ContentSection, Poll, Partner, HsmEvent, NotificationItem, VideoItem,
+} from '../types';
 import {
   mockShows, mockTopSections, mockBottomSections,
-  mockPoll, mockPartners,
+  mockPoll, mockPartners, mockEvent, mockNotifications,
 } from './mock';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -149,4 +151,120 @@ export async function fetchPartners(): Promise<Partner[]> {
   } catch {
     return mockPartners;
   }
+}
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.round(diff / 60000);
+  if (min < 1) return 'À l’instant';
+  if (min < 60) return `Il y a ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `Il y a ${h}h`;
+  const d = Math.round(h / 24);
+  return d === 1 ? 'Hier' : `Il y a ${d} j`;
+}
+
+export async function fetchFeaturedEvent(): Promise<HsmEvent | null> {
+  if (!isSupabaseConfigured) return mockEvent;
+  try {
+    const { data } = await supabase
+      .from('events')
+      .select('id, title, starts_at')
+      .eq('featured', true)
+      .order('starts_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (!data) return mockEvent;
+    let countdown = '';
+    if (data.starts_at) {
+      const diff = new Date(data.starts_at).getTime() - Date.now();
+      if (diff > 0) {
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        countdown = days > 0 ? `${days} jours ${hours}h` : `${hours}h`;
+      } else countdown = 'En cours';
+    }
+    return { id: data.id, title: data.title, countdown };
+  } catch {
+    return mockEvent;
+  }
+}
+
+export async function fetchNotifications(): Promise<NotificationItem[]> {
+  if (!isSupabaseConfigured) return mockNotifications;
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('id, body, created_at')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error || !data?.length) return mockNotifications;
+    return data.map((n) => ({ id: n.id, text: n.body, time: relativeTime(n.created_at) }));
+  } catch {
+    return mockNotifications;
+  }
+}
+
+/** Charts : top vidéos par nombre de vues. */
+export async function fetchTopVideos(limit = 10): Promise<VideoItem[]> {
+  if (!isSupabaseConfigured) {
+    return mockTopSections.flatMap((s) => s.items).slice(0, limit);
+  }
+  try {
+    const { data, error } = await supabase
+      .from('videos')
+      .select('*')
+      .order('views', { ascending: false })
+      .limit(limit);
+    if (error || !data?.length) {
+      return mockTopSections.flatMap((s) => s.items).slice(0, limit);
+    }
+    return data.map((v) => ({
+      id: v.id,
+      title: v.title,
+      meta: `${CATEGORY_LABELS[v.kind] ?? v.kind} · ${fmtViews(v.views)}`,
+      kind: v.kind,
+      thumbUrl: v.thumb_url,
+      showPlay: !['article', 'newsletter'].includes(v.kind),
+    }));
+  } catch {
+    return mockTopSections.flatMap((s) => s.items).slice(0, limit);
+  }
+}
+
+export interface TopFan {
+  id: string;
+  name: string;
+  points: number;
+}
+
+export async function fetchTopFans(limit = 10): Promise<TopFan[]> {
+  if (!isSupabaseConfigured) return [];
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, fan_points')
+      .order('fan_points', { ascending: false })
+      .limit(limit);
+    if (error || !data?.length) return [];
+    return data.map((p) => ({
+      id: p.id,
+      name: p.full_name ?? 'Fan',
+      points: p.fan_points,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Enregistre le vote de l'utilisateur courant (1 vote/sondage via PK). */
+export async function submitVote(pollId: string, optionId: string): Promise<{ error?: string }> {
+  if (!isSupabaseConfigured) return {};
+  const { data: sess } = await supabase.auth.getUser();
+  const uid = sess.user?.id;
+  if (!uid) return { error: 'Connecte-toi pour voter.' };
+  const { error } = await supabase
+    .from('poll_votes')
+    .insert({ poll_id: pollId, option_id: optionId, user_id: uid });
+  return error ? { error: error.message } : {};
 }

@@ -11,19 +11,31 @@ import {
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { colors } from './src/theme';
+import { AuthProvider } from './src/lib/auth';
 import { HomeScreen } from './src/screens/HomeScreen';
-import { PlaceholderScreen } from './src/screens/PlaceholderScreen';
+import { LiveScreen } from './src/screens/LiveScreen';
+import { ShowsScreen } from './src/screens/ShowsScreen';
+import { ChartsScreen } from './src/screens/ChartsScreen';
+import { AccountScreen } from './src/screens/AccountScreen';
 import { BottomNav } from './src/components/BottomNav';
 
-const TITLES: Record<string, string> = {
-  live: 'En direct',
-  shows: 'Émissions',
-  charts: 'Charts',
-  account: 'Compte',
-};
+function Router() {
+  const [tab, setTab] = useState('home');
+  return (
+    <View style={styles.root}>
+      <View style={styles.content}>
+        {tab === 'home' && <HomeScreen />}
+        {tab === 'live' && <LiveScreen />}
+        {tab === 'shows' && <ShowsScreen />}
+        {tab === 'charts' && <ChartsScreen />}
+        {tab === 'account' && <AccountScreen />}
+      </View>
+      <BottomNav active={tab} onSelect={setTab} />
+    </View>
+  );
+}
 
 export default function App() {
-  const [tab, setTab] = useState('home');
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -32,19 +44,14 @@ export default function App() {
     Inter_800ExtraBold,
   });
 
-  if (!fontsLoaded) {
-    return <View style={styles.root} />;
-  }
+  if (!fontsLoaded) return <View style={styles.root} />;
 
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <View style={styles.root}>
-        <View style={styles.content}>
-          {tab === 'home' ? <HomeScreen /> : <PlaceholderScreen title={TITLES[tab] ?? tab} />}
-        </View>
-        <BottomNav active={tab} onSelect={setTab} />
-      </View>
+      <AuthProvider>
+        <Router />
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

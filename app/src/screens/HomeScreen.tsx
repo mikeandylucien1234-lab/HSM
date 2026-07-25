@@ -11,13 +11,12 @@ import { ShowCard } from '../components/ShowCard';
 import { ContentRow } from '../components/ContentRow';
 import { PollCard } from '../components/PollCard';
 import { Thumb } from '../components/Thumb';
-import type { Show, ContentSection, Poll, Partner } from '../types';
+import type { Show, ContentSection, Poll, Partner, NotificationItem, HsmEvent } from '../types';
 import {
   fetchShows, fetchContentSections, fetchActivePoll, fetchPartners,
+  fetchFeaturedEvent, fetchNotifications,
 } from '../data/repository';
-import {
-  mockNotifications, mockEvent, mockContinueWatching,
-} from '../data/mock';
+import { mockEvent, mockContinueWatching } from '../data/mock';
 
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -28,17 +27,22 @@ export function HomeScreen() {
   const [bottom, setBottom] = useState<ContentSection[]>([]);
   const [poll, setPoll] = useState<Poll | null>(null);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [event, setEvent] = useState<HsmEvent | null>(mockEvent);
 
   useEffect(() => {
     (async () => {
-      const [s, sections, p, pa] = await Promise.all([
+      const [s, sections, p, pa, notifs, ev] = await Promise.all([
         fetchShows(), fetchContentSections(), fetchActivePoll(), fetchPartners(),
+        fetchNotifications(), fetchFeaturedEvent(),
       ]);
       setShows(s);
       setTop(sections.top);
       setBottom(sections.bottom);
       setPoll(p);
       setPartners(pa);
+      setNotifications(notifs);
+      setEvent(ev);
       setLoading(false);
     })();
   }, []);
@@ -54,9 +58,9 @@ export function HomeScreen() {
           <Ionicons name="search" size={22} color={colors.text} />
           <View>
             <Ionicons name="notifications-outline" size={22} color={colors.text} />
-            {mockNotifications.length > 0 && (
+            {notifications.length > 0 && (
               <View style={styles.badge}>
-                <Text style={styles.badgeText}>{mockNotifications.length}</Text>
+                <Text style={styles.badgeText}>{notifications.length}</Text>
               </View>
             )}
           </View>
@@ -105,14 +109,18 @@ export function HomeScreen() {
           </View>
 
           {/* Événement spécial */}
-          <View style={styles.eventBanner}>
-            <View style={styles.eventLeft}>
-              <Text style={styles.eventTag}>ÉVÉNEMENT SPÉCIAL</Text>
-              <Text style={styles.eventTitle}>{mockEvent.title}</Text>
-              <Text style={styles.eventCountdown}>Commence dans {mockEvent.countdown}</Text>
+          {event && (
+            <View style={styles.eventBanner}>
+              <View style={styles.eventLeft}>
+                <Text style={styles.eventTag}>ÉVÉNEMENT SPÉCIAL</Text>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                {!!event.countdown && (
+                  <Text style={styles.eventCountdown}>Commence dans {event.countdown}</Text>
+                )}
+              </View>
+              <Ionicons name="trophy" size={30} color={colors.gold} />
             </View>
-            <Ionicons name="trophy" size={30} color={colors.gold} />
-          </View>
+          )}
 
           {/* Continuer à regarder */}
           <View style={styles.sectionHead}>
