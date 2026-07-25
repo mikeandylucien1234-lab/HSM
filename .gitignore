@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Env
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.*
+
+# OS
+.DS_Store
